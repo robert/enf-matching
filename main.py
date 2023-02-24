@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from scipy import signal
-
+from tqdm import tqdm
 
 def load_wav(fpath):
     """Loads a .wav file and returns the data and sample rate.
@@ -97,7 +97,7 @@ def enf_series(data, fs, nominal_freq, freq_band_size, harmonic_n=1):
     bin_size = f[1] - f[0]
 
     max_freqs = []
-    for spectrum in np.abs(np.transpose(Zxx)):
+    for spectrum in tqdm(np.abs(np.transpose(Zxx))):
         max_amp = np.amax(spectrum)
         max_freq_idx = np.where(spectrum == max_amp)[0][0]
 
@@ -152,7 +152,7 @@ def search(target_enf, reference_enf):
     :returns: list of tuples of (reference index, PMCC), sorted desc by PMCC
     """
     n_steps = len(reference_enf) - len(target_enf)
-    reference_enfs = (reference_enf[step:step+len(target_enf)] for step in range(n_steps))
+    reference_enfs = (reference_enf[step:step+len(target_enf)] for step in tqdm(range(n_steps)))
 
     coeffs = sorted_pmccs(target_enf, reference_enfs)
     return coeffs
