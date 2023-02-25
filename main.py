@@ -25,7 +25,7 @@ def load_wav(fpath):
         fs = wav_f.getframerate()
 
         clip_len_s = len(data) / fs
-        print(f"Loaded .wav file, n_samples={len(data)} len_s={clip_len_s}")
+        print(f"Loaded {fpath} file, n_samples={len(data)} len_s={clip_len_s}")
 
         return (data, fs)
 
