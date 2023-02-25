@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 from scipy import signal
 from tqdm import tqdm
 
+from lib.pickling import *
+from os.path import exists
+
 def load_wav(fpath):
     """Loads a .wav file and returns the data and sample rate.
 
@@ -214,21 +217,36 @@ def plot_series_ax(ax, series, label=None):
     ax.plot(t, series, label=label)
 
 
+def wav_to_enf(filename, nominal_freq, freq_band_size, harmonic_n=1):
+    """
+    This code attempts to load a pickle file that contains the enf samples. 
+    If the pickle file does not exist, the code loads the corresponding wav file, 
+    processes it, and saves the enf samples in a new pickle file. 
+    This approach prevents unnecessary loading and computing.
+    """
+    pklfilename = "." + filename + ".pkl"
+    if exists(pklfilename):
+        return decompress_pickle(pklfilename)
+    else:
+        ref_data, ref_fs = load_wav(filename)
+        enf =  enf_series(ref_data, ref_fs, nominal_freq, freq_band_size, harmonic_n)
+        compress_pickle(pklfilename, enf)
+        return enf
+
 if __name__ == "__main__":
     nominal_freq = 50
     freq_band_size = 0.2
 
-    # !!!: make sure to run ./bin/download-example-files first
-    ref_data, ref_fs = load_wav("./001_ref.wav")
+    refwav = '001_ref.wav'
+    wav = "001.wav"
 
-    ref_enf_output = enf_series(ref_data, ref_fs, nominal_freq, freq_band_size)
+    # !!!: make sure to run ./bin/download-example-files first
+    ref_enf_output = wav_to_enf(refwav, nominal_freq, freq_band_size, harmonic_n=1)
     ref_enf = ref_enf_output['enf']
 
     # !!!: make sure to run ./bin/download-example-files first
-    data, fs = load_wav("./001.wav")
-
     harmonic_n = 1
-    enf_output = enf_series(data, fs, nominal_freq, freq_band_size, harmonic_n=2)
+    enf_output = wav_to_enf(wav, nominal_freq, freq_band_size, harmonic_n=2)
     target_enf = enf_output['enf']
 
     stft = enf_output['stft']
