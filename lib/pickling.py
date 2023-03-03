@@ -6,14 +6,13 @@ import sys
 
 # Pickle a file and then compress it into a file with extension 
 def compress_pickle(filename, data):
- sys.stderr.write("loading pickle %s..." % filename)
- with bz2.BZ2File(filename, 'w') as f: 
-   cPickle.dump(data, f)
+    sys.stderr.write("Saving pickle %s..." % filename)
+    with bz2.BZ2File(filename, 'w') as f: 
+        cPickle.dump(data, f)
 
 # Load any compressed pickle file
 def decompress_pickle(filename):
- sys.stderr.write("saving pickle %s..." % filename)
- data = bz2.BZ2File(filename, 'rb')
- data = cPickle.load(data)
- return data
-
+    sys.stderr.write("Loading pickle %s..." % filename)
+    data = bz2.BZ2File(filename, 'rb')
+    data = cPickle.load(data)
+    return data
