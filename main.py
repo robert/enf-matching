@@ -142,9 +142,7 @@ def sorted_pmccs(target, references):
     :returns: list of tuples of (reference index, PMCC), sorted desc by PMCC
     """
     pmccs = [pmcc(target, r) for r in references]
-    sorted_pmccs = [(idx, v) for idx, v in sorted(enumerate(pmccs), key=lambda item: -item[1])]
-
-    return sorted_pmccs
+    return list(sorted(enumerate(pmccs), key=lambda item: -item[1]))
 
 
 def search(target_enf, reference_enf):
@@ -157,8 +155,7 @@ def search(target_enf, reference_enf):
     n_steps = len(reference_enf) - len(target_enf)
     reference_enfs = (reference_enf[step:step+len(target_enf)] for step in tqdm(range(n_steps)))
 
-    coeffs = sorted_pmccs(target_enf, reference_enfs)
-    return coeffs
+    return sorted_pmccs(target_enf, reference_enfs)
 
 
 def gb_reference_data(year, month, day=None):
@@ -224,14 +221,13 @@ def wav_to_enf(filename, nominal_freq, freq_band_size, harmonic_n=1):
     processes it, and saves the enf samples in a new pickle file. 
     This approach prevents unnecessary loading and computing.
     """
-    pklfilename = "." + filename + ".pkl"
+    pklfilename = f".{filename}.pkl"
     if exists(pklfilename):
         return decompress_pickle(pklfilename)
-    else:
-        ref_data, ref_fs = load_wav(filename)
-        enf =  enf_series(ref_data, ref_fs, nominal_freq, freq_band_size, harmonic_n)
-        compress_pickle(pklfilename, enf)
-        return enf
+    ref_data, ref_fs = load_wav(filename)
+    enf =  enf_series(ref_data, ref_fs, nominal_freq, freq_band_size, harmonic_n)
+    compress_pickle(pklfilename, enf)
+    return enf
 
 if __name__ == "__main__":
     nominal_freq = 50
@@ -255,7 +251,7 @@ if __name__ == "__main__":
     Zxx = stft['Zxx']
 
     pmccs = search(target_enf, ref_enf)
-    print(pmccs[0:100])
+    print(pmccs[:100])
     predicted_ts = pmccs[0][0]
     print(f"Best predicted timestamp is {predicted_ts}")
     # True value provided by creator of example file
