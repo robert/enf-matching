@@ -173,13 +173,13 @@ def gb_reference_data(year, month, day=None):
     cache_fpath = os.path.join(cache_dir, f"./{year}-{month}.csv")
 
     if not os.path.exists(cache_fpath):
-        ret = requests.get("https://data.nationalgrideso.com/system/system-frequency-data/datapackage.json")
+        ret = requests.get("https://data.nationalgrideso.com/system/system-frequency-data/datapackage.json", timeout=30)
         ret.raise_for_status()
 
         ret_data = ret.json()
         csv_resource = next(r for r in ret_data['resources'] if r['path'].endswith(f"/fnew-{year}-{month}.csv"))
 
-        ret = requests.get(csv_resource['path'])
+        ret = requests.get(csv_resource['path'], timeout=30)
         ret.raise_for_status()
 
         with open(cache_fpath, 'w') as f:
